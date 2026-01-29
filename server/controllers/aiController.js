@@ -173,7 +173,7 @@ export const generateImage = async (req, res) => {
 export const removeImageBackground = async (req, res) => {
   try {
     const userId = req.userId;
-    const image = req.files.image;
+    const image = req.file;
     const plan = req.plan;
 
     if (plan !== "premium") {
@@ -183,12 +183,11 @@ export const removeImageBackground = async (req, res) => {
       });
     }
 
-    const { secure_url } = await cloudinary.uploader.upload(image.path, {
+    const base64Image = `data:${image.mimetype};base64,${image.buffer.toString("base64")}`;
+
+    const { secure_url } = await cloudinary.uploader.upload(base64Image, {
       transformation: [
-        {
-          effect: "background_removal",
-          background_removal: "remove_the_background",
-        },
+        { effect: "background_removal", background_removal: "remove_the_background" },
       ],
     });
 
@@ -234,7 +233,7 @@ export const removeImageObject = async (req, res) => {
 export const reviewResume = async (req, res) => {
   try {
     const userId = req.userId;
-    const resume = req.files.resume;
+    const resume = req.file;
     const plan = req.plan;
 
     if (plan !== "premium") {
@@ -252,8 +251,7 @@ export const reviewResume = async (req, res) => {
     }
 
     const dataBuffer = fs.readFileSync(resume.path);
-    const pdfData = await pdf(dataBuffer);
-
+    const pdfData = await pdf(resume.buffer);
     const prompt = `Review the following resume and provide constructive feedback on its strengths, weaknesses, and areas for improvement. Resume Content:\n\n${pdfData.text}`;
 
     const response = await AI.chat.completions.create({
