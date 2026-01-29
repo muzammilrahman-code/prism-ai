@@ -29,28 +29,43 @@ const BlogTitles = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    
+    if (!input.trim()) {
+      toast.error("Please enter a keyword");
+      return;
+    }
+
     try {
       setLoading(true);
       const prompt = `Generate a blog title for the keyword ${input} in the category ${selectedCategory}`;
+
+      const token = await getToken();
 
       const { data } = await axios.post(
         "/api/ai/generate-blog-title",
         { prompt },
         {
-          headers: { Authorization: `Bearer ${await getToken()}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       if (data.success) {
         setContent(data.content);
+        toast.success("Title generated successfully!");
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to generate title");
       }
     } catch (error) {
-      toast.error(error.message);
-    }
+      console.log("Error:", error);
 
-    setLoading(false);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,7 +96,7 @@ const BlogTitles = () => {
           {blogCategories.map((item) => (
             <span
               onClick={() => setSelectedCategory(item)}
-              className={`text-xs px-4 py-1 border rounded-full ${
+              className={`text-xs px-4 py-1 border cursor-pointer rounded-full ${
                 selectedCategory === item
                   ? "bg-purple-50 text-purple-700"
                   : "text-gray-500 border-gray-300"

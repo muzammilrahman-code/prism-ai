@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { SignIn, useUser } from "@clerk/clerk-react";
+import ChatWidget from "../components/ChatWidget";
 
 const Layout = () => {
   const navigate = useNavigate();
@@ -15,12 +16,12 @@ const Layout = () => {
   return user ? (
     <div className="flex flex-col items-start justify-start h-screen">
       <nav className="w-full px-8 min-h-14 flex items-center justify-between border-b border-gray-200">
-        <img
+        <h1
           onClick={() => navigate("/")}
-          src={assets.logo}
-          alt="logo"
-          className="cursor-pointer w-32 sm:w-44"
-        />
+          className="cursor-pointer w-32 text-3xl font-bold text-blue-700 sm:w-44"
+        >
+          Prism Ai
+        </h1>
         {sidebar ? (
           <X
             onClick={() => setSidebar(false)}
@@ -40,6 +41,7 @@ const Layout = () => {
           <Outlet />
         </div>
       </div>
+      <ChatWidget />
     </div>
   ) : (
     <div className="flex items-center justify-center h-screen">

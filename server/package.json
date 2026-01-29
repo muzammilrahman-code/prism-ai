@@ -14,14 +14,16 @@
   "dependencies": {
     "@clerk/express": "^1.7.24",
     "@neondatabase/serverless": "^1.0.1",
-    "axios": "^1.11.0",
-    "cloudinary": "^2.7.0",
+    "axios": "^1.13.2",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "form-data": "^4.0.4",
     "multer": "^2.0.2",
-    "openai": "^5.15.0",
-    "pdf-parse": "^1.1.1"
+    "openai": "^5.23.2",
+    "pdf-parse": "^1.1.1",
+    "pdfkit": "^0.16.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

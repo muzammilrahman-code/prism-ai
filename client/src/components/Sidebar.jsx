@@ -13,14 +13,15 @@ import {
 import { NavLink } from "react-router-dom";
 
 const navItems = [
-  { to: "/ai", label: "Dashboard", Icon: House },
-  { to: "/ai/write-article", label: "Write Article", Icon: SquarePen },
-  { to: "/ai/blog-titles", label: "Blog Titles", Icon: Hash },
-  { to: "/ai/generate-images", label: "Generate Images", Icon: Image },
-  { to: "/ai/remove-background", label: "Remove Background", Icon: Eraser },
-  { to: "/ai/remove-object", label: "Remove Object", Icon: Scissors },
-  { to: "/ai/review-resume", label: "Review Resume", Icon: FileText },
-  { to: "/ai/community", label: "Community", Icon: Users },
+  { to: "/ai", label: "Dashboard", Icon: House, premium: false },
+  { to: "/ai/write-article", label: "Write Article", Icon: SquarePen, premium: false },
+  { to: "/ai/blog-titles", label: "Blog Titles", Icon: Hash, premium: false },
+  { to: "/ai/generate-images", label: "Generate Images", Icon: Image, premium: true },
+  { to: "/ai/remove-background", label: "Remove Background", Icon: Eraser, premium: true },
+  { to: "/ai/remove-object", label: "Remove Object", Icon: Scissors, premium: true },
+  { to: "/ai/review-resume", label: "Review Resume", Icon: FileText, premium: true },
+  { to: "/ai/document-converter", label: "Document Converter", Icon: FileText, premium: false },
+  { to: "/ai/community", label: "Community", Icon: Users, premium: false },
 ];
 
 const Sidebar = ({ sidebar, setSidebar }) => {
@@ -42,14 +43,14 @@ const Sidebar = ({ sidebar, setSidebar }) => {
         <h1 className="mt-1 text-center">{user.fullName}</h1>
 
         <div className="px-6 mt-5 text-sm text-gray-600 font-medium">
-          {navItems.map(({ to, label, Icon }) => (
+          {navItems.map(({ to, label, Icon, premium }) => (
             <NavLink
               key={to}
               to={to}
               end={to === "/ai"}
               onClick={() => setSidebar(false)}
               className={({ isActive }) =>
-                `px-3.5 py-2.5 flex items-center gap-3 rounded ${
+                `px-3.5 py-2.5 flex items-center gap-3 rounded justify-between group ${
                   isActive
                     ? "bg-gradient-to-r from-[#3C81F6] to-[#9234EA] text-white"
                     : ""
@@ -58,8 +59,15 @@ const Sidebar = ({ sidebar, setSidebar }) => {
             >
               {({ isActive }) => (
                 <>
-                  <Icon className={`w-4 h-4 ${isActive ? "text-white" : ""}`} />
-                  {label}
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${isActive ? "text-white" : ""}`} />
+                    {label}
+                  </div>
+                  {premium && (
+                    <span className="text-xs bg-gradient-to-r from-[#FF61C5] to-[#9E53EE] text-white px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition">
+                      Pro
+                    </span>
+                  )}
                 </>
               )}
             </NavLink>

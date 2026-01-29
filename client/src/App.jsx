@@ -3,12 +3,14 @@ import Home from "./pages/Home";
 import Layout from "./pages/Layout";
 import Dashboard from "./pages/Dashboard";
 import WriteArticle from "./pages/WriteArticle";
+
 import BlogTitles from "./pages/BlogTitles";
 import GenerateImages from "./pages/GenerateImages";
 import RemoveBackground from "./pages/RemoveBackground";
 import RemoveObject from "./pages/RemoveObject";
 import ReviewResume from "./pages/ReviewResume";
 import Community from "./pages/Community";
+import DocumentConverter from "./components/DocumentConverter";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
@@ -25,7 +27,9 @@ const App = () => {
           <Route path="remove-background" element={<RemoveBackground />} />
           <Route path="remove-object" element={<RemoveObject />} />
           <Route path="review-resume" element={<ReviewResume />} />
+          <Route path="document-converter" element={<DocumentConverter />} />
           <Route path="community" element={<Community />} />
+          
         </Route>
       </Routes>
     </div>

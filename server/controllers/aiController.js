@@ -13,14 +13,14 @@ const AI = new OpenAI({
 
 export const generateArticle = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const userId = req.userId;
     const { prompt, length } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
     if (plan !== "premium" && free_usage >= 10) {
       return res.json({
-        succes: false,
+        success: false,
         message: "Limit reached. Upgrade to continue.",
       });
     }
@@ -58,18 +58,38 @@ export const generateArticle = async (req, res) => {
 
 export const generateBlogTitle = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const userId = req.userId;
     const { prompt } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
-    if (plan !== "premium" && free_usage >= 10) {
+    console.log("🎯 generateBlogTitle called - userId:", userId, "plan:", plan, "free_usage:", free_usage);
+
+    if (!userId) {
+      console.log("❌ No userId found");
       return res.json({
-        succes: false,
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    if (!prompt) {
+      console.log("❌ No prompt found");
+      return res.json({
+        success: false,
+        message: "Prompt is required",
+      });
+    }
+
+    if (plan !== "premium" && free_usage >= 10) {
+      console.log("❌ Free usage limit reached");
+      return res.json({
+        success: false,
         message: "Limit reached. Upgrade to continue.",
       });
     }
 
+    console.log("📡 Calling Gemini API...");
     const response = await AI.chat.completions.create({
       model: "gemini-2.0-flash",
       messages: [{ role: "user", content: prompt }],
@@ -77,11 +97,15 @@ export const generateBlogTitle = async (req, res) => {
       max_tokens: 100,
     });
 
+    console.log("✅ Gemini API response received");
     const content = response.choices[0].message.content;
 
+    console.log("💾 Inserting into database...");
     await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'blog-title') `;
+    console.log("✅ Database insertion successful");
 
     if (plan !== "premium") {
+      console.log("📊 Updating free usage count...");
       await clerkClient.users.updateUserMetadata(userId, {
         privateMetadata: {
           free_usage: free_usage + 1,
@@ -89,22 +113,30 @@ export const generateBlogTitle = async (req, res) => {
       });
     }
 
+    console.log("🎉 Success! Sending response");
     res.json({ success: true, content });
   } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
+    console.error("❌ generateBlogTitle error - Full Error:", {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data || error.response
+    });
+    res.json({ 
+      success: false, 
+      message: error.message || "Failed to generate blog title" 
+    });
   }
 };
 
 export const generateImage = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const userId = req.userId;
     const { prompt, publish } = req.body;
     const plan = req.plan;
 
     if (plan !== "premium") {
       return res.json({
-        succes: false,
+        success: false,
         message: "This feature is only available for premium subscriptions",
       });
     }
@@ -140,13 +172,13 @@ export const generateImage = async (req, res) => {
 
 export const removeImageBackground = async (req, res) => {
   try {
-    const { userId } = req.auth();
-    const image = req.file;
+    const userId = req.userId;
+    const image = req.files.image;
     const plan = req.plan;
 
     if (plan !== "premium") {
       return res.json({
-        succes: false,
+        success: false,
         message: "This feature is only available for premium subscriptions",
       });
     }
@@ -171,14 +203,14 @@ export const removeImageBackground = async (req, res) => {
 
 export const removeImageObject = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const userId = req.userId;
+    const image = req.files.image;
     const { object } = req.body;
-    const image = req.file;
     const plan = req.plan;
 
     if (plan !== "premium") {
       return res.json({
-        succes: false,
+        success: false,
         message: "This feature is only available for premium subscriptions",
       });
     }
@@ -199,15 +231,15 @@ export const removeImageObject = async (req, res) => {
   }
 };
 
-export const resumeReview = async (req, res) => {
+export const reviewResume = async (req, res) => {
   try {
-    const { userId } = req.auth();
-    const resume = req.file;
+    const userId = req.userId;
+    const resume = req.files.resume;
     const plan = req.plan;
 
     if (plan !== "premium") {
       return res.json({
-        succes: false,
+        success: false,
         message: "This feature is only available for premium subscriptions",
       });
     }
